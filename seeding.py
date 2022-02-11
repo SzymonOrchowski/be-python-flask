@@ -1,4 +1,5 @@
 import psycopg2
+import json
 from config import config
 
 def createTable():
@@ -29,13 +30,37 @@ def createTable():
 
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-        
+
     finally:
         if conn is not None:
             conn.close()
 
 def insertData():
-    print('insertData')
+    formatedData = []
+    data = json.loads(open("./data/data.json").read())
+    for recipe in data:
+        formatedData.append((recipe['id'],recipe['imageUrl'],recipe['instructions'],str(recipe['ingredients'])))
+    queries = (
+        """
+        INSERT INTO recipes (original_id, imageUrl, instructions, ingredients) VALUES (%s, %s, %s, %s);
+        """,
+    )
+    conn = None
+    try:
+        params = config()
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        cur.executemany(queries[0], formatedData)
+        cur.close()
+        conn.commit()
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()
+    
 
 if __name__ == "__main__":
     createTable()
