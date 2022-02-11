@@ -36,15 +36,19 @@ def createTable():
             conn.close()
 
 def insertData():
-    formatedData = []
+
     data = json.loads(open("./data/data.json").read())
+
+    formatedData = []
     for recipe in data:
         formatedData.append((recipe['id'],recipe['imageUrl'],recipe['instructions'],str(recipe['ingredients'])))
+
     queries = (
         """
         INSERT INTO recipes (original_id, imageUrl, instructions, ingredients) VALUES (%s, %s, %s, %s);
         """,
     )
+
     conn = None
     try:
         params = config()
