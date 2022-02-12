@@ -1,4 +1,5 @@
 import psycopg2
+import json
 from flask import Flask, request, jsonify
 from config import config
 
@@ -6,20 +7,24 @@ app = Flask(__name__)
 
 @app.route("/api/recipes", methods=['GET'])
 def getRecipes():
-    userQueries = request.args.get('exclude_ingredients').split(',')
-    for ingredient in userQueries:
-        if ingredient[len(ingredient) - 1] == 's':
-            userQueries[userQueries.index(ingredient)] = ingredient[:-1]
-
     sqlQuery = 'SELECT * FROM recipes'
-    if len(userQueries) > 0:
+
+    userQueries = request.args.get('exclude_ingredients')
+
+    if userQueries != None:
+        excludedIngredients = userQueries.split(',')
+        
+        for ingredient in excludedIngredients:
+            if ingredient[len(ingredient) - 1] == 's':
+                excludedIngredients[excludedIngredients.index(ingredient)] = ingredient[:-1]
+        
         sqlQuery += ' WHERE '
-        for ingredient in userQueries:
+        
+        for ingredient in excludedIngredients:
             sqlQuery += f" ingredients NOT LIKE '%''{ingredient}''%' "
-            if userQueries.index(ingredient) != len(userQueries) -1:
+            if excludedIngredients.index(ingredient) != len(excludedIngredients) -1:
                 sqlQuery += "AND"
     
-    print(sqlQuery)
     params = config()
     conn = psycopg2.connect(**params)
     cur = conn.cursor()
@@ -28,4 +33,63 @@ def getRecipes():
     cur.close()
     conn.commit()
 
-    return jsonify(rows)
+    recipes = []
+    
+    for recipe in rows:
+        properListOfingredients = []
+
+        splitIngredientsList = recipe[4][1:-1].split('}, ')
+
+        for ingredient in splitIngredientsList:
+            if splitIngredientsList.index(ingredient) != len(splitIngredientsList) - 1:
+                splitIngredientsList[splitIngredientsList.index(ingredient)] += '}'
+
+        for ingredient in splitIngredientsList:
+            properListOfingredients.append(json.loads(ingredient.replace("\'", "\"")))
+
+        recipes.append({
+            "id": recipe[0],
+            "originalId": recipe[1],
+            "imageUrl": recipe[2],
+            "instructions": recipe[3],
+            "ingredients": properListOfingredients,
+        })
+
+    return jsonify(recipes)
+
+@app.route("/api/recipes/<id>", methods=['GET'])
+def getRecipeById(id):
+    sqlQuery = f'SELECT * FROM recipes WHERE id = {id}'
+
+    params = config()
+    conn = psycopg2.connect(**params)
+    cur = conn.cursor()
+    cur.execute(sqlQuery)
+    rows = cur.fetchall()
+    cur.close()
+    conn.commit()
+
+    recipes = []
+    
+    for recipe in rows:
+        properListOfingredients = []
+
+        splitIngredientsList = recipe[4][1:-1].split('}, ')
+
+        for ingredient in splitIngredientsList:
+            if splitIngredientsList.index(ingredient) != len(splitIngredientsList) - 1:
+                splitIngredientsList[splitIngredientsList.index(ingredient)] += '}'
+
+        for ingredient in splitIngredientsList:
+            properListOfingredients.append(json.loads(ingredient.replace("\'", "\"")))
+
+        recipes.append({
+            "id": recipe[0],
+            "originalId": recipe[1],
+            "imageUrl": recipe[2],
+            "instructions": recipe[3],
+            "ingredients": properListOfingredients,
+        })
+
+    return jsonify(recipes)
+
