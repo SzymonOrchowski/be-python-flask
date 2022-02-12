@@ -15,7 +15,7 @@ def getAllRecipes():
         
         for ingredient in excludedIngredients:
             if ingredient[len(ingredient) - 1] == 's':
-                excludedIngredients[excludedIngredients.index(ingredient)] = ingredient[:-1]
+                excludedIngredients.append(ingredient[:-1])
         
         sqlQuery += ' WHERE '
         
