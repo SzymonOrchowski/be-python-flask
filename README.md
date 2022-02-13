@@ -10,7 +10,7 @@ PostgreSQL 13.4
 
 1. Fork and clone this repository.
 2. Install PostgreSQL, Flask and pytest
-
+3. Install psycopg2 (a PostgreSQL database adapter for the Python) - https://www.psycopg.org/docs/install.html
 <h2>How to run the project</h2>
 
 Go to the main folder of the repo and run following command: <br/>
@@ -27,9 +27,11 @@ You can run the current test suite by:
 You can run the server by command:
 > flask run
 
-It will react on port 5000 localhost on following endpoints (you can test the using e.g Insomnia):
-localhost:5000/api/recipes
-localhost:5000/api/recipes/:id
+It will react on port 5000 localhost on following endpoints (you can test the using e.g Insomnia):<br/>
+>localhost:5000/api/recipes <br/>
+>localhost:5000/api/recipes/:id
+
+<h1>Endpoints:</h1>
 
 <h3>/api/recipes</h3>
 
