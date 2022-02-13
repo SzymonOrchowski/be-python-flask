@@ -4,13 +4,14 @@
 
 Minimum setup requirements:
 
-Python 3.9.2
-Flask 2.0.2
-PostgreSQL 13.4
+Python 3.9.2<br/>
+Flask 2.0.2<br/>
+PostgreSQL 13.4<br/>
+psycopg2 2.9.3
 
 1. Fork and clone this repository.
 2. Install PostgreSQL, Flask and pytest
-3. Install psycopg2 (a PostgreSQL database adapter for the Python) - https://www.psycopg.org/docs/install.html
+3. Install psycopg2-binary (a PostgreSQL database adapter for the Python) - https://www.psycopg.org/docs/install.html
 <h2>How to run the project</h2>
 
 Go to the main folder of the repo and run following command: <br/>
